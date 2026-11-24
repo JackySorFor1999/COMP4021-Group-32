@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="Two couriers. One campus. Three minutes to deliver more than your rival.">
+  <title>Campus Courier Clash · Special delivery. Serious rivalry.</title>
+  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io/socket.io.js" defer></script>
+  <script src="/scripts/bounding_box.js" defer></script>
+  <script src="/scripts/sprite.js" defer></script>
+  <script src="/scripts/renderer.js" defer></script>
+  <script src="/scripts/courier_game.js" defer></script>
+  <script src="/scripts/game_room.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Campus Courier Clash home">
+      <img src="/assets/icon.svg" width="40" height="40" alt="">
+      <span>CAMPUS<br><b>COURIER CLASH</b></span>
+    </a>
+    <nav aria-label="Main navigation">
+      <button class="nav-link" id="help-button">How to play <span aria-hidden="true">↗</span></button>
+      <button class="nav-link" id="rankings-button">Leaderboard</button>
+      <span class="nav-divider"></span>
+      <button class="sound-button" id="sound-button" aria-pressed="true" title="Toggle game sounds">♪ <span>Sound on</span></button>
+      <button class="nav-link hidden" id="signout-button">Sign out</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home-page" class="page home-page">
+      <div class="hero-heading">
+        <div>
+          <p class="eyebrow"><span class="live-dot"></span> A LITTLE CAMPUS CHAOS</p>
+          <h1>Special delivery.<br><span>Serious rivalry.</span></h1>
+        </div>
+        <div class="hero-summary">
+          <p>Two couriers. One campus.<br>Outrun the robots. Outdeliver your rival.</p>
+          <div class="tags"><span>2 PLAYERS</span><span>3 MINUTES</span><span>BIG MAIN-CHARACTER ENERGY</span></div>
+        </div>
+      </div>
+
+      <div class="launch-grid">
+        <aside class="dispatch-card">
+          <div class="card-topline"><span class="eyebrow">THE DISPATCH DESK</span><span class="tiny-parcel" aria-hidden="true">▧</span></div>
+          <div id="auth-panel">
+            <h2>Your shift starts here.</h2>
+            <p class="muted">Grab a friend. We’ve got parcels to move.</p>
+            <div class="auth-tabs" role="tablist" aria-label="Account access">
+              <button id="signin-tab" role="tab" aria-selected="true" aria-controls="signin-form">Sign in</button>
+              <button id="register-tab" role="tab" aria-selected="false" aria-controls="register-form">Create account</button>
+            </div>
+            <form id="signin-form" aria-labelledby="signin-tab">
+              <label for="signin-username">Username</label>
+              <input id="signin-username" name="username" autocomplete="username" placeholder="Your courier ID" required maxlength="20">
+              <label for="signin-password">Password</label>
+              <input id="signin-password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required maxlength="128">
+              <p class="form-message" id="signin-message" role="status" aria-live="polite"></p>
+              <button type="submit" class="button primary full">Clock in <span>→</span></button>
+            </form>
+            <form id="register-form" class="hidden" aria-labelledby="register-tab">
+              <div class="form-row">
+                <div><label for="register-name">Display name</label><input id="register-name" name="name" autocomplete="nickname" placeholder="What we call you" required maxlength="20"></div>
+                <div><label for="register-username">Username</label><input id="register-username" name="username" autocomplete="username" placeholder="Your unique ID" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]{3,20}"></div>
+              </div>
+              <p class="field-hint">Username: 3–20 letters, numbers, or underscores.</p>
+              <label for="register-password">Password <span class="label-note">at least 8 characters</span></label>
+              <input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="Make it a good one">
+              <label for="register-confirm">Confirm password</label>
+              <input id="register-confirm" name="confirmPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="One more time">
+              <p class="form-message" id="register-message" role="status" aria-live="polite"></p>
+              <button type="submit" class="button primary full">Get your courier ID <span>→</span></button>
+            </form>
+            <p class="desk-footnote">A friendly rivalry. A very unfriendly delivery deadline.</p>
+          </div>
+
+          <div id="matchmaking-panel" class="hidden">
+            <p class="welcome-label">WELCOME BACK,</p>
+            <h2 id="welcome-name"></h2>
+            <p class="muted" id="connection-message" role="status">Connecting to dispatch…</p>
+            <button class="button primary full" id="create-room-button" disabled>Start a new shift <span>+</span></button>
+            <div class="or-divider"><span>or join a friend</span></div>
+            <form id="join-form">
+              <label for="room-code">Room code</label>
+              <div class="join-row"><input id="room-code" placeholder="ABCDE" maxlength="5" minlength="5" required autocomplete="off" spellcheck="false"><button class="button dark" id="join-room-button" disabled>Join →</button></div>
+            </form>
+            <p class="form-message" id="room-message" role="status"></p>
+            <div class="open-rooms"><p class="eyebrow">OPEN SHIFTS</p><div id="open-rooms-list"><p class="muted small">No open shifts yet. Start one above.</p></div></div>
+          </div>
+
+          <div id="waiting-panel" class="hidden">
+            <h2>Meet at dispatch.</h2>
+            <p class="muted">Share this code with your rival.</p>
+            <button class="room-code-display" id="copy-code" title="Copy room code"><span id="waiting-code">ABCDE</span><span class="copy-label">COPY ↗</span></button>
+            <div class="waiting-players" id="waiting-players"></div>
+            <p class="small muted" id="waiting-message" role="status">Waiting for another courier…</p>
+            <button class="button primary full" id="ready-button">Ready for delivery <span>→</span></button>
+            <button class="button text full" id="leave-room-button">Leave room</button>
+          </div>
+        </aside>
+
+        <div class="campus-card">
+          <div class="map-topline"><span><span class="live-dot"></span> LIVE FROM THE QUAD</span><span>N ↑</span></div>
+          <canvas id="preview-canvas" width="1200" height="720" aria-label="Animated preview of the campus, two couriers, delivery robots, and parcels"></canvas>
+          <div class="map-caption"><span class="map-caption-title">Your campus. Your turf.</span><span class="map-legend"><i class="legend-dot blue"></i> YOU <i class="legend-dot coral"></i> YOUR RIVAL <i class="legend-dot gold"></i> THE GOODS</span></div>
+          <div class="map-sticker"><span>HANDLE WITH</span><strong>HUSTLE.</strong><span>✦ SPECIAL DELIVERY ✦</span></div>
+        </div>
+      </div>
+
+      <section class="how-section" id="how-to-play" aria-labelledby="how-heading">
+        <div class="section-heading"><h2 id="how-heading">A quick guide to the hustle.</h2><span>SMALL PARCELS. BIG PLANS.</span></div>
+        <div class="how-grid">
+          <article><span class="step-number">01</span><div><h3>Pick up the goods.</h3><p>Collect the golden parcels around the quad. Your bag holds three, so make every trip count.</p></div></article>
+          <article><span class="step-number">02</span><div><h3>Deliver. Disrupt. Repeat.</h3><p>Return to your colored desk to score. Dash into your rival to spill a parcel. Watch for patrolling robots.</p></div></article>
+          <article><span class="step-number">03</span><div><h3>Own the last mile.</h3><p>First to 12 points wins. At three minutes, the higher score wins. Equal scores? Call it a draw.</p></div></article>
+        </div>
+        <div class="home-controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys to move</span><span><kbd>SPACE</kbd> to dash · 3s cooldown</span><button class="nav-link" id="all-rules-button">All rules & cheat mode ↗</button></div>
+      </section>
+      <section class="leaderboard-section" id="leaderboard-section" aria-labelledby="leaderboard-heading">
+        <div class="section-heading"><div><p class="eyebrow">THE CAMPUS HONOR ROLL</p><h2 id="leaderboard-heading">Legends of the last mile.</h2></div><span>WINS FIRST · DELIVERIES BREAK TIES</span></div>
+        <div class="leaderboard-wrap" id="home-leaderboard"></div>
+      </section>
+    </section>
+
+    <section id="game-page" class="page game-page hidden" aria-label="Live match">
+      <div class="match-topline"><span class="eyebrow"><span class="live-dot"></span> SHIFT IN PROGRESS <span id="game-room-label"></span></span><button class="nav-link" id="exit-match-button">Leave match ↗</button></div>
+      <div class="scoreboard">
+        <div class="score-card blue-team"><img src="/assets/courier-blue-icon.svg" alt="" width="42" height="42"><div><span class="score-team" id="blue-tag">BLUE COURIER</span><strong id="blue-name">Courier one</strong></div><div class="score-value"><b id="blue-score">0</b><span>/ 12</span></div></div>
+        <div class="match-clock"><span class="eyebrow">TIME LEFT</span><strong id="match-timer">03:00</strong><span id="match-phase">FIRST TO 12</span></div>
+        <div class="score-card coral-team"><img src="/assets/courier-coral-icon.svg" alt="" width="42" height="42"><div><span class="score-team" id="coral-tag">CORAL COURIER</span><strong id="coral-name">Courier two</strong></div><div class="score-value"><b id="coral-score">0</b><span>/ 12</span></div></div>
+      </div>
+      <div class="arena-wrap">
+        <canvas id="game-canvas" width="1200" height="720" tabindex="0" aria-label="Campus Courier Clash arena. Use WASD or arrow keys to move, Space to dash, C to toggle cheat mode."></canvas>
+        <div class="arena-overlay hidden" id="countdown-overlay"><span>YOUR SHIFT STARTS IN</span><strong id="countdown-number">3</strong><p>Collect parcels. Return to your colored desk.</p></div>
+        <div class="connection-banner hidden" id="game-connection-message" role="status"></div>
+        <div class="cheat-banner hidden" id="cheat-banner">CHEAT MODE ACTIVE <span>Speed + immunity + 12 points per parcel · C to disable</span></div>
+      </div>
+      <div class="game-toolbar">
+        <div class="bag-status"><span class="toolbar-label">YOUR BAG</span><div id="bag-slots" aria-label="Carried parcels"><span>▧</span><span>▧</span><span>▧</span></div><strong id="bag-count">0 / 3</strong></div>
+        <div class="dash-status"><span class="toolbar-label">DASH</span><div class="dash-meter"><span id="dash-meter-fill"></span></div><strong id="dash-status">Ready</strong></div>
+        <p class="player-status" id="player-status">Grab a parcel. Make a move.</p>
+        <div class="game-key-guide"><span><kbd>WASD</kbd> move</span><span><kbd>SPACE</kbd> dash</span><span><kbd>C</kbd> cheat</span></div>
+      </div>
+      <div class="touch-controls" aria-label="Touch or mouse game controls"><div class="touch-pad"><button data-move="up" aria-label="Move up">↑</button><button data-move="left" aria-label="Move left">←</button><button data-move="down" aria-label="Move down">↓</button><button data-move="right" aria-label="Move right">→</button></div><button id="touch-dash" class="button dark">Dash</button><button id="touch-cheat" class="button">Cheat</button></div>
+    </section>
+
+    <section id="results-page" class="page results-page hidden" aria-labelledby="result-title">
+      <div class="result-hero"><span class="result-stamp" id="result-stamp" aria-hidden="true">✓</span><p class="eyebrow" id="result-perspective">YOUR MATCH RESULT</p><h1 id="result-title">Shift complete.</h1><p class="result-winner" id="result-winner"></p><p id="result-subtitle" class="muted"></p><span class="result-badge" id="result-badge"></span></div>
+      <div class="result-summary" id="result-summary"></div>
+      <div class="results-actions"><button class="button primary" id="rematch-button">Run it back <span>↻</span></button><button class="button secondary" id="home-button">Back to dispatch <span>→</span></button></div>
+      <p class="rematch-message" id="rematch-message" role="status"></p>
+      <section class="result-statistics"><div class="section-heading"><h2>The delivery report.</h2><span>EVERY PARCEL COUNTS</span></div><div id="result-statistics"></div></section>
+      <section class="leaderboard-section"><div class="section-heading"><div><p class="eyebrow">THE CAMPUS HONOR ROLL</p><h2>Overall player rankings.</h2></div><span>ALL COMPLETED RANKED MATCHES</span></div><div class="leaderboard-wrap" id="results-leaderboard"></div></section>
+    </section>
+  </main>
+
+  <footer class="site-footer"><span>CAMPUS COURIER CLASH <i>© 2026</i></span><span>MADE FOR A LITTLE FRIENDLY COMPETITION.</span><span>COMP4021 · GROUP 32</span></footer>
+  <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-heading"><p class="eyebrow">YOUR COURIER HANDBOOK</p><button class="dialog-close" data-close="help-dialog" aria-label="Close instructions">×</button></div>
+    <h2 id="help-title">Know the route. Win the shift.</h2>
+    <ol class="rule-list">
+      <li><b>Pair up.</b> Create two accounts in separate browser sessions. One courier creates a room; the other joins with its code. Both click Ready.</li>
+      <li><b>Move and collect.</b> Use WASD or arrow keys. Walk over animated gold parcels to collect them. Carry up to three at once.</li>
+      <li><b>Make the delivery.</b> Walk into your own colored delivery desk. Your bag is deposited automatically for one point per parcel.</li>
+      <li><b>Make a little trouble.</b> Space dashes in your movement direction (or the direction you last faced). A dash hit stuns your rival briefly and drops one of their parcels. Dash recharges in three seconds.</li>
+      <li><b>Mind the campus traffic.</b> Robots stun you and drop one parcel on contact. A short immunity window prevents repeated hits. Collect a green speed boost for five seconds of faster movement; it respawns after twelve seconds.</li>
+      <li><b>Take the win.</b> Reach 12 points first, or lead when the three-minute timer ends. Equal scores are a draw. A player who leaves an active match forfeits; a connection loss has a 15-second reconnection window.</li>
+      <li><b>Try cheat mode.</b> Press C to toggle increased speed, robot and dash-hit immunity, and 12 points per delivered parcel. Press C again to restore normal abilities. Any match that used cheating is marked as practice and excluded from cumulative rankings. A new match resets cheating.</li>
+    </ol>
+    <p class="dialog-note">To test two accounts on one computer, use a normal window and a private window, or two different browsers. Tabs in the same browser share a login session.</p>
+    <button class="button primary full" data-close="help-dialog">Got it. Let’s deliver. <span>→</span></button>
+  </dialog>
+  <dialog id="leave-dialog" aria-labelledby="leave-title"><div class="dialog-heading"><p class="eyebrow">LEAVING SO SOON?</p><button class="dialog-close" data-close="leave-dialog" aria-label="Close">×</button></div><h2 id="leave-title">Clock out early?</h2><p>Your rival will win by forfeit if the shift has started. You can start a new shift from dispatch.</p><div class="dialog-actions"><button class="button secondary" data-close="leave-dialog">Keep delivering</button><button class="button primary" id="confirm-leave-button">Leave match</button></div></dialog>
+
+  <audio id="audio-pickup" src="/assets/sounds/pickup.wav" preload="auto"></audio>
+  <audio id="audio-collision" src="/assets/sounds/collision.wav" preload="auto"></audio>
+  <audio id="audio-delivery" src="/assets/sounds/delivery.wav" preload="auto"></audio>
+  <audio id="audio-dash" src="/assets/sounds/dash.wav" preload="auto"></audio>
+  <audio id="audio-finish" src="/assets/sounds/finish.wav" preload="auto"></audio>
+</body>
+</html>

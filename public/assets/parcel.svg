@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="64" viewBox="0 0 256 64"><g transform="translate(0 0)">
+      <path d="M13 22L32 13L51 22L32 32Z" fill="#f5d48a" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M13 22V43L32 53V32Z" fill="#d7a557" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M32 32V53L51 43V22Z" fill="#e9bb6b" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M22 18L42 27V38L37 40V29L17 20Z" fill="#fff0c3"/>
+      <rect x="17" y="32" width="9" height="6" rx="1" fill="#f8e2af"/>
+      <path d="M53 12V20M49 16H57" stroke="#fff1c1" stroke-width="2" opacity="1"/>
+    </g><g transform="translate(64 -2)">
+      <path d="M13 22L32 13L51 22L32 32Z" fill="#f5d48a" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M13 22V43L32 53V32Z" fill="#d7a557" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M32 32V53L51 43V22Z" fill="#e9bb6b" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M22 18L42 27V38L37 40V29L17 20Z" fill="#fff0c3"/>
+      <rect x="17" y="32" width="9" height="6" rx="1" fill="#f8e2af"/>
+      <path d="M53 12V20M49 16H57" stroke="#fff1c1" stroke-width="2" opacity="0.4"/>
+    </g><g transform="translate(128 0)">
+      <path d="M13 22L32 13L51 22L32 32Z" fill="#f5d48a" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M13 22V43L32 53V32Z" fill="#d7a557" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M32 32V53L51 43V22Z" fill="#e9bb6b" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M22 18L42 27V38L37 40V29L17 20Z" fill="#fff0c3"/>
+      <rect x="17" y="32" width="9" height="6" rx="1" fill="#f8e2af"/>
+      <path d="M53 12V20M49 16H57" stroke="#fff1c1" stroke-width="2" opacity="0.2"/>
+    </g><g transform="translate(192 2)">
+      <path d="M13 22L32 13L51 22L32 32Z" fill="#f5d48a" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M13 22V43L32 53V32Z" fill="#d7a557" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M32 32V53L51 43V22Z" fill="#e9bb6b" stroke="#ba8b41" stroke-width="1.5"/>
+      <path d="M22 18L42 27V38L37 40V29L17 20Z" fill="#fff0c3"/>
+      <rect x="17" y="32" width="9" height="6" rx="1" fill="#f8e2af"/>
+      <path d="M53 12V20M49 16H57" stroke="#fff1c1" stroke-width="2" opacity="0.7"/>
+    </g></svg>
