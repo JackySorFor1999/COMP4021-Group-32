@@ -4,3 +4,28 @@ data/users.json
 data/*.tmp
 test-results/
 coverage/
+target/
+dependency-reduced-pom.xml
+*.class
+
+# Database files
+*.db
+*.lg
+
+# macOS
+.DS_Store
+
+# Claude tooling
+.claude/
+.claude-flow/
+.mcp.json
+
+# Archives
+Phase1.zip
+comp4321-group38.zip
+
+# Compiled web app classes
+WEB-INF/classes/
+
+# Generated directories
+generated-images/
